@@ -63,6 +63,9 @@ module.exports =
         unless m
             throw new Error 'mixin must be called with a function that returns a value'
         m
+    tap: (fn, args...) ->
+        fn.apply this, args
+        this
     from: (arg) ->
         this.set '_mohair', this._mohair.from arg
 

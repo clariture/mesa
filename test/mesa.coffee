@@ -506,3 +506,56 @@ module.exports =
                         throw err if err?
                         test.deepEqual authors, [{name: 'foo'}, {name: 'bar'}]
                         test.done()
+
+    'tap':
+
+        'call without args': (test) ->
+            test.expect 4
+
+            connection =
+                query: (sql, params, cb) ->
+                    test.equal sql, 'SELECT name FROM "user" WHERE id = $1'
+                    test.deepEqual params, [3]
+                    cb null, {rows: [{name: 'foo'}, {name: 'bar'}]}
+
+            callViaTap = ->
+                test.equal arguments.length, 0
+
+            userTable = mesa
+                .connection(connection)
+                .table('user')
+
+            userTable
+                .where(id: 3)
+                .select('name')
+                .tap(callViaTap)
+                .find (err, users) ->
+                    throw err if err?
+                    test.deepEqual users, [{name: 'foo'}, {name: 'bar'}]
+                    test.done()
+
+        'call with args': (test) ->
+            test.expect 5
+
+            connection =
+                query: (sql, params, cb) ->
+                    test.equal sql, 'SELECT name FROM "user" WHERE id = $1'
+                    test.deepEqual params, [3]
+                    cb null, {rows: [{name: 'foo'}, {name: 'bar'}]}
+
+            callViaTap = (arg1, arg2) ->
+                test.equal arg1, 2
+                test.equal arg2, 4
+
+            userTable = mesa
+                .connection(connection)
+                .table('user')
+
+            userTable
+                .where(id: 3)
+                .select('name')
+                .tap(callViaTap, 2, 4)
+                .find (err, users) ->
+                    throw err if err?
+                    test.deepEqual users, [{name: 'foo'}, {name: 'bar'}]
+                    test.done()
