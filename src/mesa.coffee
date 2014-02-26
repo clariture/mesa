@@ -58,6 +58,9 @@ module.exports =
         this.set '_mohair', this._mohair.group arg
     with: (arg) ->
         this.set '_mohair', this._mohair.with arg
+    tap: (fn, args...) ->
+        fn.apply this, args
+        this
 
     # misc
     # ----
