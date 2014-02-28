@@ -154,6 +154,16 @@ userTable.where({id: 3}).find(function(err, user) {
 });
 ```
 
+##### distinct
+
+```javascript
+userTable
+    .distinct()
+    .join('JOIN project ON user.id = project.user_id')
+    .find(function(err, users) {
+    });
+```
+
 ##### select, join, group, order, limit, offset
 
 ```javascript

@@ -343,6 +343,28 @@ module.exports =
                 test.ok exists
                 test.done()
 
+        'distinct': (test) ->
+            test.expect 3
+
+            connection =
+                query: (sql, params, cb) ->
+                    test.equal sql, 'SELECT DISTINCT user.* FROM "user" JOIN project ON user.id = project.user_id WHERE (id = $1) AND (name = $2)'
+                    test.deepEqual params, [3, 'foo']
+                    cb null, {rows: [{name: 'foo'}, {name: 'bar'}]}
+
+            userTable = mesa
+                .connection(connection)
+                .table('user')
+                .distinct()
+                .select('user.*')
+                .where(id: 3)
+                .where('name = ?', 'foo')
+                .join('JOIN project ON user.id = project.user_id')
+                .find (err, users) ->
+                    throw err if err?
+                    test.deepEqual users, [{name: 'foo'}, {name: 'bar'}]
+                    test.done()
+
         'everything together': (test) ->
             test.expect 3
 
