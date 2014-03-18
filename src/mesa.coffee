@@ -52,8 +52,8 @@ module.exports =
         this.set '_mohair', this._mohair.limit arg
     offset: (arg) ->
         this.set '_mohair', this._mohair.offset arg
-    order: (arg) ->
-        this.set '_mohair', this._mohair.order arg
+    order: (args...) ->
+        this.set '_mohair', this._mohair.order args...
     group: (arg) ->
         this.set '_mohair', this._mohair.group arg
     with: (arg) ->
