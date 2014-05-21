@@ -410,8 +410,8 @@ module.exports =
 
             connection =
                 query: (sql, params, cb) ->
-                    test.equal sql, 'SELECT user.*, count(project.id) AS project_count FROM "user" JOIN project ON user.id = project.user_id WHERE (id = $1) AND (name = $2) GROUP BY user.id ORDER BY created DESC, name ASC LIMIT $3 OFFSET $4'
-                    test.deepEqual params, [3, 'foo', 10, 20]
+                    test.equal sql, 'SELECT user.*, count(project.id) AS project_count FROM "user" JOIN project ON user.id = project.user_id WHERE (id = $1) AND (name = $2) GROUP BY user.id HAVING project_count > $3 ORDER BY created DESC, name ASC LIMIT $4 OFFSET $5'
+                    test.deepEqual params, [3, 'foo', 2, 10, 20]
                     cb null, {rows: [{name: 'foo'}, {name: 'bar'}]}
 
             userTable = mesa
@@ -422,6 +422,7 @@ module.exports =
                 .where('name = ?', 'foo')
                 .join('JOIN project ON user.id = project.user_id')
                 .group('user.id')
+                .having('project_count > ?', 2)
                 .order('created DESC, name ASC')
                 .limit(10)
                 .offset(20)
