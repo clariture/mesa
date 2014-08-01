@@ -70,8 +70,8 @@ module.exports =
     tap: (fn, args...) ->
         fn.apply this, args
         this
-    from: (arg) ->
-        this.set '_mohair', this._mohair.from arg
+    from: (args...) ->
+        this.set '_mohair', this._mohair.from args...
 
     # misc
     # ----
