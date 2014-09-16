@@ -126,10 +126,8 @@ module.exports.update = (updates, cb) ->
     self.assertTable()
     self.assertAttributes()
 
-    cleanUpdates = _.pick updates, self._attributes
-    throw new Error 'nothing to update' if Object.keys(cleanUpdates).length is 0
+    query =  self._mohair.update updates
 
-    query =  self._mohair.update cleanUpdates
     sql = self.replacePlaceholders query.sql()
     sql += " RETURNING #{self._returning}" if self._returning?
 
