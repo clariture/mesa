@@ -38,11 +38,7 @@ module.exports.insert = (data, cb) ->
     self.assertTable()
     self.assertAttributes()
 
-    cleanData = _.pick data, self._attributes
-    if Object.keys(cleanData).length is 0
-        throw new Error 'nothing to insert'
-
-    query = self._mohair.insert cleanData
+    query = self._mohair.insert data
 
     returning = if self._returning then self._returning else self._primaryKey
     sql = self.replacePlaceholders query.sql() + " RETURNING #{returning}"
@@ -76,7 +72,8 @@ module.exports.insertMany = (array, cb) ->
     self.assertTable()
     self.assertAttributes()
 
-    query = self._mohair.insertMany array.map (x) => _.pick x, self._attributes
+    query = self._mohair.insert array
+    
     returning = if self._returning then self._returning else self._primaryKey
     sql = self.replacePlaceholders query.sql() + " RETURNING #{returning}"
 
