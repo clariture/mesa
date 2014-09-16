@@ -21,7 +21,7 @@ module.exports =
     connection: (arg) ->
         this.set '_connection', arg
     attributes: (arg) ->
-        this.set '_attributes', arg
+        (this.set '_mohair', this._mohair.attributes arg).set '_attributes', arg
     primaryKey: (arg) ->
         this.set '_primaryKey', arg
     includes: (arg) ->
