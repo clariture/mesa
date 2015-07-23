@@ -63,6 +63,7 @@ module.exports.insert = (data, cb) ->
                 row
             else
                 row[self._primaryKey]
+    query
 
 
 module.exports.insertMany = (array, cb) ->
@@ -95,6 +96,7 @@ module.exports.insertMany = (array, cb) ->
                 results.rows
             else
                 _.pluck results.rows, self._primaryKey
+    query
 
 module.exports.delete = (cb) ->
     self = this
@@ -118,6 +120,7 @@ module.exports.delete = (cb) ->
                 return
             done?()
             cb null, results
+    query
 
 module.exports.update = (updates, cb) ->
     self = this
@@ -145,6 +148,7 @@ module.exports.update = (updates, cb) ->
             done?()
             return cb null, results unless self._returning?
             return cb null, results.rows
+    query
 
 # query
 # -----
@@ -189,6 +193,7 @@ module.exports.first = (cb) ->
                     return
                 done?()
                 cb null, withIncludes[0]
+    self
 
 module.exports.find = (cb) ->
     self = this
@@ -231,6 +236,7 @@ module.exports.find = (cb) ->
                 done?()
 
                 cb null, withIncludes
+    self
 
 module.exports.exists = (cb) ->
     self = this
@@ -255,3 +261,4 @@ module.exports.exists = (cb) ->
             done?()
 
             cb null, results.rows.length isnt 0
+    query
