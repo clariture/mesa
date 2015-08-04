@@ -72,6 +72,8 @@ module.exports =
         this
     from: (args...) ->
         this.set '_mohair', this._mohair.from args...
+    using: (args...) ->
+        this.set '_mohair', this._mohair.using args...
 
     # misc
     # ----
