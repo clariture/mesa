@@ -25,7 +25,7 @@
         "node": ">=0.8.5"
     },
     "dependencies": {
-        "mohair": "clariture/mohair#81235ab4b16768eaa0799a7f3889a7f00440f55f",
+        "mohair": "clariture/mohair#latest",
         "underscore": "1.4.4"
     },
     "devDependencies": {
