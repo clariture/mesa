@@ -45,10 +45,9 @@ module.exports.insert = (data, cb) ->
 
     query = self._mohair.insert data
 
-    onConflict = if self._onConflict then " ON CONFLICT #{self._onConflict}" else ""
-    returning = " RETURNING #{if self._returning then self._returning else self._primaryKey}"
-
-    sql = self.replacePlaceholders query.sql() + onConflict + returning
+    sql = self.replacePlaceholders query.sql()
+    sql += " ON CONFLICT #{self._onConflict}" if self._onConflict?
+    sql += " RETURNING #{if self._returning then self._returning else self._primaryKey}"
 
     self.getConnection (err, connection, done) ->
         if err?
@@ -82,10 +81,9 @@ module.exports.insertMany = (array, cb) ->
 
     query = self._mohair.insert array
     
-    onConflict = if self._onConflict then " ON CONFLICT #{self._onConflict}" else ""
-    returning = " RETURNING #{if self._returning then self._returning else self._primaryKey}"
-
-    sql = self.replacePlaceholders query.sql() + onConflict + returning
+    sql = self.replacePlaceholders query.sql()
+    sql += " ON CONFLICT #{self._onConflict}" if self._onConflict?
+    sql += " RETURNING #{if self._returning then self._returning else self._primaryKey}"
 
     self.getConnection (err, connection, done) ->
         if err?
