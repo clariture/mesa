@@ -23,6 +23,11 @@ module.exports.replacePlaceholders = (sql) ->
     index = 1
     sql.replace /\?/g, -> '$' + index++
 
+module.exports.onConflict = (arg) ->
+    throw new Error 'must be a string' unless 'string' is typeof arg
+    throw new Error 'must not be the empty string' if arg.length is 0
+    this.set '_onConflict', arg
+
 module.exports.returning = (arg) ->
     throw new Error 'must be a string' unless 'string' is typeof arg
     throw new Error 'must not be the empty string' if arg.length is 0
@@ -40,8 +45,10 @@ module.exports.insert = (data, cb) ->
 
     query = self._mohair.insert data
 
-    returning = if self._returning then self._returning else self._primaryKey
-    sql = self.replacePlaceholders query.sql() + " RETURNING #{returning}"
+    onConflict = if self._onConflict then " ON CONFLICT #{self._onConflict}" else ""
+    returning = " RETURNING #{if self._returning then self._returning else self._primaryKey}"
+
+    sql = self.replacePlaceholders query.sql() + onConflict + returning
 
     self.getConnection (err, connection, done) ->
         if err?
@@ -75,8 +82,10 @@ module.exports.insertMany = (array, cb) ->
 
     query = self._mohair.insert array
     
-    returning = if self._returning then self._returning else self._primaryKey
-    sql = self.replacePlaceholders query.sql() + " RETURNING #{returning}"
+    onConflict = if self._onConflict then " ON CONFLICT #{self._onConflict}" else ""
+    returning = " RETURNING #{if self._returning then self._returning else self._primaryKey}"
+
+    sql = self.replacePlaceholders query.sql() + onConflict + returning
 
     self.getConnection (err, connection, done) ->
         if err?

@@ -138,3 +138,32 @@ module.exports =
             userTable.find (err) ->
                 throw err if err?
                 test.done()
+
+        'insert with on conflict': (test) ->
+
+            test.expect 3
+
+            connection =
+                query: (sql, params, cb) ->
+                    test.equal sql, 'INSERT INTO "user"("name", "email") VALUES ($1, $2) ON CONFLICT DO UPDATE SET ref_count = user.ref_count + 1 RETURNING *'
+                    test.deepEqual params, ['foo', 'foo@example.com']
+                    cb null, {rows: [{id: 3, name: 'foo', email: 'foo@example.com'}]}
+
+            userTable = mesa
+                .connection(connection)
+                .table('user')
+                .attributes(['name', 'email'])
+
+            userTable
+                .primaryKey('my_id')
+                .onConflict('DO UPDATE SET ref_count = user.ref_count + 1')
+                .returning('*')
+                .insert {name: 'foo', email: 'foo@example.com', x: 5}, (err, record) ->
+                    throw err if err?
+                    test.deepEqual record,
+                        id: 3
+                        name: 'foo'
+                        email: 'foo@example.com'
+
+                    test.done()
+
