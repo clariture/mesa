@@ -167,3 +167,28 @@ module.exports =
 
                     test.done()
 
+        'insert multiple with on conflict': (test) ->
+
+            test.expect 3
+
+            connection =
+                query: (sql, params, cb) ->
+                    test.equal sql, 'INSERT INTO "user"("name", "email") VALUES ($1, $2), ($3, $4) ON CONFLICT DO UPDATE SET ref_count = user.ref_count + 1 RETURNING id'
+                    test.deepEqual params, ['foo', 'foo@example.com', 'bar', 'bar@example.com']
+                    cb null, {rows: [{id: 3}, {id: 4}]}
+
+            userTable = mesa
+                .connection(connection)
+                .table('user')
+                .attributes(['name', 'email'])
+
+            userTable
+            .onConflict('DO UPDATE SET ref_count = user.ref_count + 1')
+            .insertMany [
+                {name: 'foo', email: 'foo@example.com', x: 5}
+                {name: 'bar', email: 'bar@example.com', x: 6}
+            ], (err, ids) ->
+                throw err if err?
+                test.deepEqual ids, [3, 4]
+                test.done()
+
