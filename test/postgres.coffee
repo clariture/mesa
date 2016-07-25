@@ -184,11 +184,12 @@ module.exports =
 
             userTable
             .onConflict('DO UPDATE SET ref_count = user.ref_count + 1')
+            .returning('id')
             .insertMany [
                 {name: 'foo', email: 'foo@example.com', x: 5}
                 {name: 'bar', email: 'bar@example.com', x: 6}
-            ], (err, ids) ->
+            ], (err, recs) ->
                 throw err if err?
-                test.deepEqual ids, [3, 4]
+                test.deepEqual recs, [{id: 3}, {id: 4}]
                 test.done()
 

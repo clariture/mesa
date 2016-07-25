@@ -47,7 +47,7 @@ module.exports.insert = (data, cb) ->
 
     sql = self.replacePlaceholders query.sql()
     sql += " ON CONFLICT #{self._onConflict}" if self._onConflict?
-    sql += " RETURNING #{if self._returning then self._returning else self._primaryKey}"
+    sql += " RETURNING #{self._returning}" if self._returning?
 
     self.getConnection (err, connection, done) ->
         if err?
@@ -60,15 +60,9 @@ module.exports.insert = (data, cb) ->
                 done?()
                 cb err
                 return
-
-            row = results.rows[0]
-
             done?()
-
-            cb null, if self._returning?
-                row
-            else
-                row[self._primaryKey]
+            return cb null, results unless self._returning?
+            return cb null, results.rows[0]
     query
 
 
@@ -83,7 +77,7 @@ module.exports.insertMany = (array, cb) ->
     
     sql = self.replacePlaceholders query.sql()
     sql += " ON CONFLICT #{self._onConflict}" if self._onConflict?
-    sql += " RETURNING #{if self._returning then self._returning else self._primaryKey}"
+    sql += " RETURNING #{self._returning}" if self._returning?
 
     self.getConnection (err, connection, done) ->
         if err?
@@ -96,13 +90,9 @@ module.exports.insertMany = (array, cb) ->
                 done?()
                 cb err
                 return
-
             done?()
-
-            cb null, if self._returning?
-                results.rows
-            else
-                _.pluck results.rows, self._primaryKey
+            return cb null, results unless self._returning?
+            return cb null, results.rows
     query
 
 module.exports.delete = (cb) ->

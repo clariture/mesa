@@ -102,10 +102,11 @@ module.exports =
                 .connection(connection)
                 .table('user')
                 .attributes(['name', 'email'])
+                .returning('id')
 
             userTable.insert {name: 'foo', email: 'foo@example.com', x: 5}, (err, id) ->
                 throw err if err?
-                test.equal id, 3
+                test.deepEqual id, {id: 3}
                 test.done()
 
         'insert with raw': (test) ->
@@ -122,13 +123,14 @@ module.exports =
                 .connection(connection)
                 .table('user')
                 .attributes(['name', 'id'])
+                .returning('id')
 
             userTable.insert {name: 'foo', id: userTable.raw('LOG(?, ?)', 3, 4)}, (err, id) ->
                 throw err if err?
-                test.equal id, 3
+                test.deepEqual id, {id: 3}
                 test.done()
 
-        'insert with custom primaryKey': (test) ->
+        'insert with custom returning': (test) ->
 
             test.expect 3
 
@@ -136,7 +138,7 @@ module.exports =
                 query: (sql, params, cb) ->
                     test.equal sql, 'INSERT INTO "user"("name", "email") VALUES ($1, $2) RETURNING my_id'
                     test.deepEqual params, ['foo', 'foo@example.com']
-                    cb null, {rows: [{id: 3, my_id: 5}]}
+                    cb null, {rows: [{my_id: 5}]}
 
             userTable = mesa
                 .connection(connection)
@@ -144,10 +146,10 @@ module.exports =
                 .attributes(['name', 'email'])
 
             userTable
-                .primaryKey('my_id')
+                .returning('my_id')
                 .insert {name: 'foo', email: 'foo@example.com', x: 5}, (err, id) ->
                     throw err if err?
-                    test.equal id, 5
+                    test.deepEqual id, { my_id: 5 }
                     test.done()
 
         'insert with returning': (test) ->
@@ -191,13 +193,14 @@ module.exports =
                 .connection(connection)
                 .table('user')
                 .attributes(['name', 'email'])
+                .returning('id')
 
             userTable.insertMany [
                 {name: 'foo', email: 'foo@example.com', x: 5}
                 {name: 'bar', email: 'bar@example.com', x: 6}
             ], (err, ids) ->
                 throw err if err?
-                test.deepEqual ids, [3, 4]
+                test.deepEqual ids, [{id: 3}, {id: 4}]
                 test.done()
 
         'delete': (test) ->
@@ -449,13 +452,13 @@ module.exports =
                     mesa.insert.call @connection(connection), data, (err, userId) =>
                         return cb err if err?
 
-                        test.equal userId, 200
+                        test.deepEqual userId, {id: 200}
 
                         # do other things in the transaction...
 
                         connection.query 'COMMIT;', [], (err) =>
                             return cb err if err?
-                            cb null, 500
+                            cb null, {id: 500}
 
         getConnection = (cb) ->
             call = 1
@@ -481,9 +484,10 @@ module.exports =
             .table('user')
             .connection(getConnection)
             .attributes(['name', 'email'])
+            .returning('id')
             .insert {name: 'foo', email: 'foo@example.com'}, (err, userId) ->
                 throw err if err?
-                test.equal userId, 500
+                test.deepEqual userId, {id: 500}
                 test.done()
 
     'mixin':
