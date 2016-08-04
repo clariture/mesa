@@ -18,6 +18,7 @@ module.exports =
             userTable = mesa
                 .connection(getConnection)
                 .table('user')
+                .returning('id')
                 .attributes(['name'])
 
             userTable.insert {name: 'foo'}, (err, id) ->
@@ -32,7 +33,7 @@ module.exports =
                     done = -> test.ok true
                     connection =
                         query: (sql, params, cb) ->
-                            cb()
+                            cb null, {rowCount: 5}
                     cb null, connection, done
 
             userTable = mesa

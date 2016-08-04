@@ -221,13 +221,13 @@ module.exports =
                 test.done()
 
         'update': (test) ->
-            test.expect 2
+            test.expect 3
 
             connection =
                 query: (sql, params, cb) ->
                     test.equal sql, 'UPDATE "user" SET "name" = $1, "email" = $2 WHERE (id = $3) AND (name = $4)'
                     test.deepEqual params, ['bar', 'bar@example.com', 3, 'foo']
-                    cb()
+                    cb null, {rowCount: 1}
 
             userTable = mesa
                 .connection(connection)
@@ -236,8 +236,9 @@ module.exports =
 
             updates = {name: 'bar', x: 5, y: 8, email: 'bar@example.com'}
 
-            userTable.where(id: 3).where(name: 'foo').update updates, (err) ->
+            userTable.where(id: 3).where(name: 'foo').update updates, (err, results) ->
                 throw err if err?
+                test.equal results, 1
                 test.done()
 
         'update with returning': (test) ->
@@ -263,13 +264,13 @@ module.exports =
                 test.done()
 
         'update with raw': (test) ->
-            test.expect 2
+            test.expect 3
 
             connection =
                 query: (sql, params, cb) ->
                     test.equal sql, 'UPDATE "user" SET "id" = LOG($1, $2), "name" = $3 WHERE (id = LOG($4, $5)) AND (name = $6)'
                     test.deepEqual params, [7, 8, 'bar', 11, 12, 'foo']
-                    cb()
+                    cb null, {rowCount: 1}
 
             userTable = mesa
                 .connection(connection)
@@ -286,18 +287,19 @@ module.exports =
             userTable
                 .where(id: userTable.raw('LOG(?, ?)', 11, 12))
                 .where(name: 'foo')
-                .update updates, (err) ->
+                .update updates, (err, results) ->
                     throw err if err?
+                    test.equal results, 1
                     test.done()
 
         'update with from': (test) ->
-            test.expect 2
+            test.expect 3
 
             connection =
                 query: (sql, params, cb) ->
                     test.equal sql, 'UPDATE "author" SET "name" = $1, "email" = $2 FROM addresses AS a, (SELECT * FROM contacts WHERE status = $3) AS c WHERE (((((author.id = $4) AND (author.name = $5)) AND (a.author_id = author.id)) AND (c.author_id = author.id)) AND (a.city = $6)) AND (c.name = $7)'
                     test.deepEqual params, ['bar', 'bar@example.com', 'active', 3, 'foo', 'abcdef', 'bar']
-                    cb()
+                    cb null, {rowCount: 1}
 
             userTable = mesa
                 .connection(connection)
@@ -306,18 +308,19 @@ module.exports =
 
             updates = {name: 'bar', x: 5, y: 8, email: 'bar@example.com'}
 
-            userTable.from("addresses AS a, (SELECT * FROM contacts WHERE status = ?) AS c", "active").where("author.id": 3).where("author.name": 'foo').where("a.author_id = author.id").where("c.author_id = author.id").where("a.city": "abcdef").where("c.name": "bar").update updates, (err) ->
+            userTable.from("addresses AS a, (SELECT * FROM contacts WHERE status = ?) AS c", "active").where("author.id": 3).where("author.name": 'foo').where("a.author_id = author.id").where("c.author_id = author.id").where("a.city": "abcdef").where("c.name": "bar").update updates, (err, results) ->
                 throw err if err?
+                test.equal results, 1
                 test.done()
 
         'update with from (to match README)': (test) ->
-            test.expect 2
+            test.expect 3
 
             connection =
                 query: (sql, params, cb) ->
                     test.equal sql, 'UPDATE "customer" SET "status" = $1 FROM project AS p WHERE ((customer.status = $2) AND (customer.id = p.customer_id)) AND (p.status = $3)'
                     test.deepEqual params, ['active', 'dormant', 'in_progress']
-                    cb()
+                    cb null, {rowCount: 1}
 
             customerTable = mesa
                 .connection(connection)
@@ -326,8 +329,9 @@ module.exports =
 
             updates = {name: 'bar', status: 'active', y: 8, email: 'bar@example.com'}
 
-            customerTable.from("project AS p").where("customer.status": "dormant").where("customer.id = p.customer_id").where("p.status": "in_progress").update updates, (err) ->
+            customerTable.from("project AS p").where("customer.status": "dormant").where("customer.id = p.customer_id").where("p.status": "in_progress").update updates, (err, results) ->
                 throw err if err?
+                test.equal results, 1
                 test.done()
 
     'query':

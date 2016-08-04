@@ -61,8 +61,7 @@ module.exports.insert = (data, cb) ->
                 cb err
                 return
             done?()
-            return cb null, results unless self._returning?
-            return cb null, results.rows[0]
+            return cb null, if self._returning? then results.rows[0] else results.rowCount
     query
 
 
@@ -91,8 +90,7 @@ module.exports.insertMany = (array, cb) ->
                 cb err
                 return
             done?()
-            return cb null, results unless self._returning?
-            return cb null, results.rows
+            return cb null, if self._returning? then results.rows else results.rowCount
     query
 
 module.exports.delete = (cb) ->
@@ -143,8 +141,7 @@ module.exports.update = (updates, cb) ->
                 cb err
                 return
             done?()
-            return cb null, results unless self._returning?
-            return cb null, results.rows
+            return cb null, if self._returning? then results.rows else results.rowCount
     query
 
 # query
