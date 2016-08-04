@@ -114,7 +114,7 @@ module.exports.delete = (cb) ->
                 cb err
                 return
             done?()
-            cb null, results
+            cb null, results.rowCount
     query
 
 module.exports.update = (updates, cb) ->

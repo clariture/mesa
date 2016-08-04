@@ -204,20 +204,21 @@ module.exports =
                 test.done()
 
         'delete': (test) ->
-            test.expect 2
+            test.expect 3
 
             connection =
                 query: (sql, params, cb) ->
                     test.equal sql, 'DELETE FROM "user" WHERE (id = $1) AND (name = $2)'
                     test.deepEqual params, [3, 'foo']
-                    cb()
+                    cb null, {rowCount: 1}
 
             userTable = mesa
                 .connection(connection)
                 .table('user')
 
-            userTable.where(id: 3).where(name: 'foo').delete (err) ->
+            userTable.where(id: 3).where(name: 'foo').delete (err, results) ->
                 throw err if err?
+                test.equal results, 1
                 test.done()
 
         'update': (test) ->

@@ -53,14 +53,14 @@ module.exports =
                     done = -> test.ok true
                     connection =
                         query: (sql, params, cb) ->
-                            cb()
+                            cb null, 1
                     cb null, connection, done
 
             userTable = mesa
                 .connection(getConnection)
                 .table('user')
 
-            userTable.delete (err) ->
+            userTable.delete (err, count) ->
                 throw err if err?
                 test.done()
 
