@@ -65,8 +65,9 @@ module.exports.insert = (data, cb) ->
                 done?()
                 cb err
                 return
+
             done?()
-            return cb null, if self._returning? then results.rows[0] else results.rowCount
+            return cb null, if self._explain? then results.rows else if self._returning? then results.rows[0] else results.rowCount
     query
 
 
@@ -96,8 +97,9 @@ module.exports.insertMany = (array, cb) ->
                 done?()
                 cb err
                 return
+
             done?()
-            return cb null, if self._returning? then results.rows else results.rowCount
+            return cb null, if self._explain? or self._returning? then results.rows else results.rowCount
     query
 
 module.exports.delete = (cb) ->
@@ -123,8 +125,9 @@ module.exports.delete = (cb) ->
                 done?()
                 cb err
                 return
+
             done?()
-            cb null, results.rowCount
+            cb null, if self._explain? then results.rows else results.rowCount
     query
 
 module.exports.update = (updates, cb) ->
@@ -152,8 +155,9 @@ module.exports.update = (updates, cb) ->
                 done?()
                 cb err
                 return
+
             done?()
-            return cb null, if self._returning? then results.rows else results.rowCount
+            return cb null, if self._explain? or self._returning? then results.rows else results.rowCount
     query
 
 # query
@@ -184,6 +188,11 @@ module.exports.first = (cb) ->
             if err?
                 done?()
                 cb err
+                return
+
+            if self._explain?
+                done?()
+                cb null, results.rows
                 return
 
             record = results.rows[0]
@@ -231,6 +240,11 @@ module.exports.find = (cb) ->
                 cb err
                 return
 
+            if self._explain?
+                done?()
+                cb null, results.rows
+                return
+
             records = results.rows
 
             if records.length is 0
@@ -276,6 +290,5 @@ module.exports.exists = (cb) ->
                 return
 
             done?()
-
-            cb null, results.rows.length isnt 0
+            cb null, if self._explain? then results.rows else results.rows.length isnt 0
     query
