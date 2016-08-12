@@ -23,6 +23,9 @@ module.exports.replacePlaceholders = (sql) ->
     index = 1
     sql.replace /\?/g, -> '$' + index++
 
+module.exports.explain = (arg) ->
+    this.set '_explain', "#{arg or ''} "
+
 module.exports.onConflict = (arg) ->
     throw new Error 'must be a string' unless 'string' is typeof arg
     throw new Error 'must not be the empty string' if arg.length is 0
@@ -45,7 +48,9 @@ module.exports.insert = (data, cb) ->
 
     query = self._mohair.insert data
 
-    sql = self.replacePlaceholders query.sql()
+    sql = ""
+    sql += "EXPLAIN #{self._explain}" if self._explain?
+    sql += self.replacePlaceholders query.sql()
     sql += " ON CONFLICT #{self._onConflict}" if self._onConflict?
     sql += " RETURNING #{self._returning}" if self._returning?
 
@@ -74,7 +79,9 @@ module.exports.insertMany = (array, cb) ->
 
     query = self._mohair.insert array
     
-    sql = self.replacePlaceholders query.sql()
+    sql = ""
+    sql += "EXPLAIN #{self._explain}" if self._explain?
+    sql += self.replacePlaceholders query.sql()
     sql += " ON CONFLICT #{self._onConflict}" if self._onConflict?
     sql += " RETURNING #{self._returning}" if self._returning?
 
@@ -100,7 +107,10 @@ module.exports.delete = (cb) ->
     self.assertTable()
 
     query = self._mohair.delete()
-    sql = self.replacePlaceholders query.sql()
+
+    sql = ""
+    sql += "EXPLAIN #{self._explain}" if self._explain?
+    sql += self.replacePlaceholders query.sql()
 
     self.getConnection (err, connection, done) ->
         if err?
@@ -126,7 +136,9 @@ module.exports.update = (updates, cb) ->
 
     query =  self._mohair.update updates
 
-    sql = self.replacePlaceholders query.sql()
+    sql = ""
+    sql += "EXPLAIN #{self._explain}" if self._explain?
+    sql += self.replacePlaceholders query.sql()
     sql += " RETURNING #{self._returning}" if self._returning?
 
     self.getConnection (err, connection, done) ->
@@ -152,7 +164,11 @@ module.exports.first = (cb) ->
 
     self.assertConnection()
 
-    sql = self.replacePlaceholders self.sql()
+    query = self
+
+    sql = ""
+    sql += "EXPLAIN #{self._explain}" if self._explain?
+    sql += self.replacePlaceholders query.sql()
     params = self.params()
 
     self.getConnection (err, connection, done) ->
@@ -194,7 +210,11 @@ module.exports.find = (cb) ->
 
     self.assertConnection()
 
-    sql = self.replacePlaceholders self.sql()
+    query = self
+
+    sql = ""
+    sql += "EXPLAIN #{self._explain}" if self._explain?
+    sql += self.replacePlaceholders query.sql()
     params = self.params()
 
     self.getConnection (err, connection, done) ->
@@ -238,7 +258,10 @@ module.exports.exists = (cb) ->
     self.assertConnection()
 
     query =  self._mohair
-    sql = self.replacePlaceholders query.sql()
+
+    sql = ""
+    sql += "EXPLAIN #{self._explain}" if self._explain?
+    sql += self.replacePlaceholders query.sql()
 
     self.getConnection (err, connection, done) ->
         if err?
