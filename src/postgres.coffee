@@ -24,7 +24,7 @@ module.exports.replacePlaceholders = (sql) ->
     sql.replace /\?/g, -> '$' + index++
 
 module.exports.explain = (arg) ->
-    this.set '_explain', "#{arg or ''} " unless arg is false
+    if arg is false then this else this.set '_explain', "#{arg or ''} "
 
 module.exports.onConflict = (arg) ->
     throw new Error 'must be a string' unless 'string' is typeof arg
