@@ -21,7 +21,12 @@ module.exports.getConnection = (cb) ->
 module.exports.replacePlaceholders = (sql) ->
     # replace ?, ?, ... with $1, $2, ...
     index = 1
-    sql.replace /^\?|[^\\]\?/g, -> '$' + index++
+    sql
+    .split /\\\?/
+    .map (s) ->
+        s.replace /\?/g, ->
+            '$' + index++
+    .join '?'
 
 module.exports.explain = (arg) ->
     if arg is false then this else this.set '_explain', "#{arg or ''} "
