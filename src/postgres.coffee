@@ -22,7 +22,7 @@ module.exports.replacePlaceholders = (sql) ->
     # replace ?, ?, ... with $1, $2, ...
     index = 1
     sql
-    .split /\\\?/
+    .split(/\\\?/)
     .map (s) ->
         s.replace /\?/g, ->
             '$' + index++
